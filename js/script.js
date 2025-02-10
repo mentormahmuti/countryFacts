@@ -297,13 +297,13 @@ function init() {
     case '/all-countries':
       displayAllCountries();
       break;
-    case '/country-details':
+    case '/country-details.html':
       displayCountryDetails();
       break;
     case '/random-country':
       displayRandomCountry();
       break;
-    case '/search':
+    case '/search.html':
       showSearchedCountry();
       break;
   }
