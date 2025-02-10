@@ -171,34 +171,83 @@ async function filterCountries() {
 
   searchInput.addEventListener('input', function (event) {
     const query = event.target.value.toLowerCase();
-    console.log(query);
 
     const partialMatches = listOfAllCountries.filter((country) =>
       country.toLowerCase().includes(query)
     );
-    console.log(partialMatches);
+
+    manipulateModalVisibility('none');
+
+    const modalDiv = document.querySelector('.modal-content');
+    while (modalDiv.firstChild) {
+      modalDiv.removeChild(modalDiv.firstChild);
+    }
+
+    partialMatches.forEach((match) => {
+      const link = document.createElement('a');
+      link.classList.add('dropdown-item');
+      link.href = `search.html?country=${match}`;
+      link.innerHTML = `${match}`;
+
+      modalDiv.appendChild(link);
+
+      if (query.length > 0) {
+        manipulateModalVisibility('block');
+      }
+      if (query.length < 1) {
+        manipulateModalVisibility('none');
+      }
+    });
   });
 }
 
-// for (let i = 0; i < listOfAllCountries.length; i++) {
-//   if (!listOfAllCountries[i].toLowerCase().includes(query)) {
-//     console.log(listOfAllCountries[i]);
-//   } else {
-//   }
-// function filterItems(e) {
-//   const items = itemList.querySelectorAll('li');
-//   const text = e.target.value.toLowerCase();
+//Show the country that was searched by user!
+async function showSearchedCountry() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const countryName = urlParams.get('country');
 
-//   items.forEach((item) => {
-//     const itemName = item.firstChild.textContent.toLowerCase();
+  const result = await fetchAPIData(`name/${countryName}`);
 
-//     if (itemName.indexOf(text) != -1) {
-//       item.style.display = 'flex';
-//     } else {
-//       item.style.display = 'none';
-//     }
-//   });
-// }
+  const div = document.createElement('div');
+  div.classList.add('country-info');
+
+  div.innerHTML = `
+
+            <div id="country-info">
+          <img
+            src="${result[0].flags.svg}"
+            alt="Country Flag"
+            id="country-flag"
+          />
+          <div id="country-details">
+            <h2 id="country-name">${result[0].name.common}</h2>
+            <p id="country-capital"><strong>Capital:</strong> ${result[0].capital}</p>
+              <p>
+         <strong>${Object.keys(result[0].languages).length > 1 ? 'Languages:' : 'Language:'}</strong>
+   ${result[0].languages ? Object.values(result[0].languages).join(', ') : []}</p>
+            <p id="country-population">
+              <strong>Population:</strong> ${addCommas(result[0].population)}
+            </p>
+            <p id="country-continent">
+              <strong>${result[0].continents.length > 1 ? 'Continents:' : 'Continent:'}</strong> ${result[0].continents.join(', ')}
+            </p>
+            <p id="country-landlocked"><strong>Landlocked:</strong>${result[0].landlocked ? 'Yes' : 'No'}</p>
+             <p id="country-population"><strong>Borders:</strong>${result[0].borders && result[0].borders.length > 1 ? result[0].borders.join(', ') : result[0].borders || 'None'}</p>
+       <p id="country-capital"><strong>Currency:</strong> ${Object.values(result[0].currencies)[0].name}</p>
+       <p id="country-capital"><strong>Area:</strong> ${addCommas(result[0].area)} km²</p>
+       <p id="country-capital"><strong>Subregion:</strong> ${result[0].subregion}</p>
+          </div>
+          <img
+            src="${result[0].coatOfArms.svg}"
+            alt="Coat of Arms"
+            id="coat-of-arms"
+          />
+        </div>
+       `;
+
+  document.querySelector('#country-content').appendChild(div);
+  hideSpinner();
+}
 
 // Fetch DATA from REST Countries API
 async function fetchAPIData(endpoint) {
@@ -226,6 +275,10 @@ function addCommas(num) {
   return num.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
 }
 
+function manipulateModalVisibility(state) {
+  document.querySelector('.modal').style.display = `${state}`;
+}
+
 // Show spinner and hide spinner functions
 function showSpinner() {
   document.querySelector('.spinner-overlay').classList.remove('hide');
@@ -251,6 +304,7 @@ function init() {
       displayRandomCountry();
       break;
     case '/search.html':
+      showSearchedCountry();
       break;
   }
 
