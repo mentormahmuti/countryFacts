@@ -303,7 +303,7 @@ function init() {
     case '/random-country':
       displayRandomCountry();
       break;
-    case '/search.html':
+    case '/search':
       showSearchedCountry();
       break;
   }
