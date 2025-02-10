@@ -294,13 +294,13 @@ function init() {
     case '/':
       filterCountries();
       break;
-    case '/all-countries.html':
+    case '/all-countries':
       displayAllCountries();
       break;
-    case '/country-details.html':
+    case '/country-details':
       displayCountryDetails();
       break;
-    case '/random-country.html':
+    case '/random-country':
       displayRandomCountry();
       break;
     case '/search.html':
